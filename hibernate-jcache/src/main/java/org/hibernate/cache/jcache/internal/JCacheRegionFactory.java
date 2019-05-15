@@ -251,7 +251,15 @@ public class JCacheRegionFactory extends RegionFactoryTemplate {
 		final CachingProvider cachingProvider;
 		final String provider = getProp( properties, ConfigSettings.PROVIDER );
 		if ( provider != null ) {
-			cachingProvider = Caching.getCachingProvider( provider );
+			ClassLoader currentClassLoader=Thread.currentThread().getContextClassLoader();
+			try {
+				ClassLoader jcacheClassLoader=this.getClass().getClassLoader();
+				Thread.currentThread().setContextClassLoader(jcacheClassLoader);
+				cachingProvider = Caching.getCachingProvider(provider);
+			}
+			finally {
+				Thread.currentThread().setContextClassLoader(currentClassLoader);
+			}
 		}
 		else {
 			cachingProvider = Caching.getCachingProvider();
